@@ -547,41 +547,54 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
+			//设置上下文环境
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			//1。实例化beanfactory
+			//2。加载beanDefinition
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
+
 			// Prepare the bean factory for use in this context.
+			//初始化BeanFactory，设置属性
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				//模版方法，设置beanfactory属性
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				// Invoke factory processors registered as beans in the context.
+
+				//调用beanFactory后置处理器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				//注册实例化一个完整对象的所有处理器 beanPostProcesser，
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
-
+				//初始化国际资源
 				// Initialize message source for this context.
 				initMessageSource();
-
+				//初始化多播器
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
 
+				//不同子类初始化资源
 				// Initialize other special beans in specific context subclasses.
 				onRefresh();
 
+				//注册监听器
 				// Check for listener beans and register them.
 				registerListeners();
 
+				//实例化bean（非懒加载）
 				// Instantiate all remaining (non-lazy-init) singletons.
 				finishBeanFactoryInitialization(beanFactory);
 
+				//刷新beanFactory
 				// Last step: publish corresponding event.
 				finishRefresh();
 			}
@@ -668,6 +681,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+
+		//模版方法实例化bean工厂
 		refreshBeanFactory();
 		return getBeanFactory();
 	}
