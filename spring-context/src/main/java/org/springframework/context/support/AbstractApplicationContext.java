@@ -584,7 +584,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				// Invoke factory processors registered as beans in the context.
 
-				//调用beanFactory后置处理器
+				//激活beanFactory
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -606,9 +606,50 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Check for listener beans and register them.
 				registerListeners();
 
-				//实例化bean（非懒加载）
-				// Instantiate all remaining (non-lazy-init) singletons.
+				/**
+				 * doGetBean的流程
+				 *  1。获得真正的beanName（ @code transformedBeanName ） name不一定是真正的BeanDefinition里的beanName FactoryBean使用
+				 * 该方法是 &beanName
+				 *  2。使用beanName去缓冲中查找 （@code getSingleton  返回类型是BeanWrapper）
+				 * 缓存中查找bean顺序：
+				 *    ·singLetonObject 用beanName从该缓存中查找完整对象  存在返回 or 进入下一步
+				 *    ·earlySingLetonObject 用bean正在创建标识从该缓存中获取实例 存在返回 or 进入下一步
+				 *    ·singletonFactories（解决循环引用关键缓存） 加锁->从该缓存中获取创建该bean的方法（递归至doGetBean查找）
+				 *    2.1 缓存中查找到对象
+				 *    	2.1.1 跳至步骤3
+				 *    2.2 缓存中未查找到对象 （创建对象）
+				 *      ·去父容器工厂缓存中查找对象
+				 * 	  	·创建单例标识对象
+				 * 	        2.2.1 getSingleton(String beanName, ObjectFactory<?> singletonFactory) 创建bean
+				 * 	        	2.2.1.1 beforeSingletonCreation(beanName) 记录该bean在创建中标记
+				 * 	        	2.2.1.2 使用匿名类方法创建对象(doCreatBean（）)
+				 * 	        		2.2.1.2.1 调用bean后置处理器的AwareBeanPostProcesser类型判断该bean是否需要返回代理对象
+				 * 	        	  	2.2.1.2.2 创建不需要代理返回的bean
+				 * 	        	  		2.2.1.2.2.1 实例bean
+				 * 	        	  			·使用工厂方法创建bean
+				 * 	        	  			·使用构造函数创建bean
+				 * 	        	  		2.2.1.2.2.2 提前暴露 存入objectFactoryies
+				 * 	        	  		2.2.1.2.2.3 设置bean依赖
+				 * 	        	  		2.2.1.2.2.4 调用方法
+				 * 	        	  			·aware方法
+				 * 	        	  			·beanPostProcesserBefore
+				 * 	        	  			·beanPostProcesserAfter
+				 * 	        	  	    2.2.1.2.2.5 加入缓存
+				 * 	        	2.2.1.3 afterSingletonCreation() 删除对象
+				 * 	        2.2.2 跳至步骤三
+				 * 	    ·创建原型对象
+				 *
+				 *   3。从封装对象中获取bean对象 (@Code getObjectForBeanInstance)
+				 *     	·该方法主要针对FactoryBean 返回对象为调用getObjet方法
+				 **/
 				finishBeanFactoryInitialization(beanFactory);
+
+
+
+
+
+
+
 
 				//刷新beanFactory
 				// Last step: publish corresponding event.

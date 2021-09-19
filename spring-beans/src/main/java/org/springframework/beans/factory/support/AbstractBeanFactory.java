@@ -250,18 +250,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			throws BeansException {
 
 
-		/**
-		 * 创建bean的流程
-		 * 1。转换beanName
-		 * 2。从缓存中获取bean实例   @getSingleton
-		 *   2.1 bean存在 则根据bean实例类型返回对象  @getObjectForBeanInstance
-		 *   2.2 bean不存在
-		 *      2.2.0. 先创建完该bean实例的所有依赖xx
-		 *   	2.2.1. 单例模式下创建bean
-		 *   		2.2.1.1 将默认创建bean的ObjectFactory推入缓存 @getSingleton
-		 *   	    2.2.1.2
-		 *   	2.2.2. 原型模式下创建bean
-		 */
+
 
 		String beanName = transformedBeanName(name);
 		Object beanInstance;
@@ -1869,12 +1858,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param mbd the merged bean definition
 	 * @return the object to expose for the bean
 	 */
-	//获取完整对象
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
-
+		//判断是否是FactoryBean
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
