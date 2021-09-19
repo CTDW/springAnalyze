@@ -8,12 +8,12 @@ public class ContextApplication {
 	public static void main(String[] args) {
 
 
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				ContextApplication.class
-		);
+//		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+//				ContextApplication.class
+//		);
 		ClassPathXmlApplicationContext classPathXmlApplicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 		try {
-			Object student = context.getBean("student");
+//			Object student = context.getBean("student");
 		}catch (Exception e){
 			e.printStackTrace();
 		}

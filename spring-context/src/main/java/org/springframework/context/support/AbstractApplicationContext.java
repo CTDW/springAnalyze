@@ -178,20 +178,24 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Unique id for this context, if any. */
+	//上下文唯一表示，用于绑定成员变量BeanFactory的id
 	private String id = ObjectUtils.identityToString(this);
 
 	/** Display name. */
 	private String displayName = ObjectUtils.identityToString(this);
 
 	/** Parent context. */
+	//父容器 spring默认为null
 	@Nullable
 	private ApplicationContext parent;
 
 	/** Environment used by this context. */
+	//系统环境封装
 	@Nullable
 	private ConfigurableEnvironment environment;
 
 	/** BeanFactoryPostProcessors to apply on refresh. */
+	//beanDefinination 后置处理器，用于bean工厂读取bean信息时使用
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
 	/** System time in milliseconds when this context started. */
@@ -211,9 +215,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private Thread shutdownHook;
 
 	/** ResourcePatternResolver used by this context. */
+	//系统环境资源获取接口
 	private ResourcePatternResolver resourcePatternResolver;
 
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
+	//bean生命周期调用器
 	@Nullable
 	private LifecycleProcessor lifecycleProcessor;
 
@@ -222,20 +228,24 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private MessageSource messageSource;
 
 	/** Helper class used in event publishing. */
+	//多播器
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
 	/** Application startup metrics. **/
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
+	//监听器集合
 	/** Statically specified listeners. */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
 	/** Local listeners registered before refresh. */
+	//监听器集合
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
 
 	/** ApplicationEvents published before the multicaster setup. */
+	//监听事件集合
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
@@ -244,6 +254,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Create a new AbstractApplicationContext with no parent.
 	 */
 	public AbstractApplicationContext() {
+		//初始化资源加载器
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
@@ -252,7 +263,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @param parent the parent context
 	 */
 	public AbstractApplicationContext(@Nullable ApplicationContext parent) {
+		//初始化，并设置一个资源加载器
 		this();
+		//设置父容器
 		setParent(parent);
 	}
 
@@ -484,6 +497,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
+		//给定一个拥有匹配路径的获取资源文件封装的实现子类
+		//在解析资源时，实际还是调用abstractApplicationContext解析
 		return new PathMatchingResourcePatternResolver(this);
 	}
 
@@ -547,7 +562,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			//设置上下文环境
+			//设置上下文环境基本属性
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -557,7 +572,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 			// Prepare the bean factory for use in this context.
-			//初始化BeanFactory，设置属性
+			//设置bena工厂基本属性
+			//
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -572,7 +588,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				//注册实例化一个完整对象的所有处理器 beanPostProcesser，
+				//注册beanPostProcesser，
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 				//初始化国际资源
@@ -630,8 +646,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareRefresh() {
 		// Switch to active.
+		//设置启动时间
 		this.startupDate = System.currentTimeMillis();
+		//设置关闭标识
 		this.closed.set(false);
+		//设置开启标示
 		this.active.set(true);
 
 		if (logger.isDebugEnabled()) {
@@ -701,7 +720,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		//添加bean后置处理器
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+
+		//设置忽略接口
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -758,6 +780,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		//执行beanFactoryPostProcessores
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -902,7 +925,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.
 	 */
+	//完成bean实力化及初始化
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+		//初始化前准备工作
 		// Initialize conversion service for this context.
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
@@ -930,6 +955,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		//实例化bean
 		beanFactory.preInstantiateSingletons();
 	}
 

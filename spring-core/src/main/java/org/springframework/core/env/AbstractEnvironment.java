@@ -120,6 +120,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #customizePropertySources(MutablePropertySources)
 	 */
 	public AbstractEnvironment() {
+
 		this(new MutablePropertySources());
 	}
 
@@ -135,6 +136,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	protected AbstractEnvironment(MutablePropertySources propertySources) {
 		this.propertySources = propertySources;
 		this.propertyResolver = createPropertyResolver(propertySources);
+		//设置属性
 		customizePropertySources(propertySources);
 	}
 

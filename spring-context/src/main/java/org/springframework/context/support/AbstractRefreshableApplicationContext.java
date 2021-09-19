@@ -64,12 +64,15 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
+
+	//bean信息覆盖标示
 	@Nullable
 	private Boolean allowBeanDefinitionOverriding;
-
+	//循环引用标示
 	@Nullable
 	private Boolean allowCircularReferences;
 
+	//bean工厂
 	/** Bean factory for this context. */
 	@Nullable
 	private volatile DefaultListableBeanFactory beanFactory;
@@ -129,9 +132,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			//设置该bean工厂序列化id，便于根据id反序列化bean
 			beanFactory.setSerializationId(getId());
+			//拓展借口子类实现拓展
 			customizeBeanFactory(beanFactory);
 			//加载beandefinition
-
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
@@ -217,6 +220,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}

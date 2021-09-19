@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
  */
+//解析路径
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
 

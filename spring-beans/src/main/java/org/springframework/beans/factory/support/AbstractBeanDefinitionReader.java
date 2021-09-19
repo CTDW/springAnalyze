@@ -217,10 +217,13 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 					"Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
 		}
 
+		//上下文初始化默认为 PathMatchResourcePatterResolver
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
+				//获取资源
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				//加载资源
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);

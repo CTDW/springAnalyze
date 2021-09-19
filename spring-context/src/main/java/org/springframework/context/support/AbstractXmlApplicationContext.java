@@ -43,8 +43,12 @@ import org.springframework.lang.Nullable;
  * @see #getConfigLocations
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  */
+//该类用于读取xml文件到具体容器
+//1。读取beanDefinition 到BeanFactory
+//2。读取Resource 到 BeanDefinition
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
+	//xml文件格式验证标示
 	private boolean validating = true;
 
 
@@ -78,19 +82,24 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #loadBeanDefinitions
 	 */
 	@Override
+	//加载xml到beanDefination
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		//创建一个可读取xml文件到beanDefinition的实现类 该类是装饰器
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
+		//设置读取器参数
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
+		//设置xml文件格式验证开启
 		initBeanDefinitionReader(beanDefinitionReader);
+		//加载资源文件
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -119,6 +128,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		//获取前期匹配到的资源地址
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);

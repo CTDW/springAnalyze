@@ -3,6 +3,13 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
 
-<bean id="person2" class="ctdw.Compent.Student"></bean>
+<!--<bean id="person" class="ctdw.Compent.Person">-->
+<!--	<property name="student" ref="student"></property>-->
+<!--</bean>-->
+	<bean id="student" class="ctdw.Compent.Student">
+<!--		<property name="person" ref="person"></property>-->
+	</bean>
+<!--	<bean id="IBeanPostProcessor" class="ctdw.IBeanFactoryPostProcess.IBeanPostProcess"></bean>-->
+
 </beans>
 
